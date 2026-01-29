@@ -1,0 +1,23 @@
+# 深度学习框架
+ultralytics>=8.0.0  # YOLO11-pose
+paddlepaddle>=2.5.0  # PaddlePaddle
+paddleocr>=2.7.0  # PaddleOCR
+
+# Web框架
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6  # 用于文件上传
+pydantic-settings>=2.0.0  # 配置管理
+
+# 图像处理
+opencv-python>=4.8.0
+opencv-contrib-python>=4.8.0
+numpy>=1.24.0
+Pillow>=10.0.0
+
+# 工具库
+pathlib2>=2.3.7; python_version < '3.4'
+
+# 可选：如果需要GPU支持，需要安装对应的CUDA版本的paddlepaddle
+# 例如：paddlepaddle-gpu>=2.5.0
+
