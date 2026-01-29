@@ -3,7 +3,7 @@
 """
 import os
 import logging
-from typing import Optional, List
+from typing import Optional
 from pathlib import Path
 import cv2
 import numpy as np
@@ -168,98 +168,4 @@ async def recognize_plate(
         logger.error(f"API调用失败: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"服务器错误: {str(e)}")
 
-
-@router.post("/recognize_batch")
-async def recognize_plate_batch(
-    files: List[UploadFile] = File(...),
-    angles: Optional[str] = Form(None),
-    use_best_detection: Optional[str] = Form(None),
-    pipeline: LicensePlatePipelineKP = Depends(get_pipeline)
-):
-    """
-    批量识别多张车牌图像
-    
-    参数:
-    - files: 上传的图像文件列表（multipart/form-data）
-    - angles: 检测角度列表，格式: "0,90,180,270"（可选）
-    - use_best_detection: 是否使用最佳检测，格式: "true" 或 "false"（可选）
-    """
-    try:
-        # 解析参数
-        angles_list = None
-        if angles:
-            try:
-                angles_list = [float(x.strip()) for x in angles.split(',')]
-            except:
-                angles_list = None
-        
-        use_best = None
-        if use_best_detection:
-            use_best = use_best_detection.lower() == 'true'
-        
-        results = []
-        temp_paths = []
-        
-        try:
-            for file in files:
-                temp_path = None
-                try:
-                    image_bytes = await file.read()
-                    image = read_image_from_bytes(image_bytes)
-                    temp_path = save_uploaded_image(image_bytes, file.filename)
-                    temp_paths.append(temp_path)
-                    
-                    logger.info(f"开始识别: {file.filename}")
-                    result = pipeline.recognize(
-                        image_path=temp_path,
-                        angles=angles_list,
-                        use_best_detection=use_best
-                    )
-                    
-                    result_data = {
-                        "filename": file.filename,
-                        "success": result['success'],
-                        "text": result['text'],
-                        "raw_text": result['raw_text'],
-                        "confidence": float(result['confidence']),
-                        "ocr_confidence": float(result.get('ocr_confidence', 0.0)),
-                        "is_valid_plate": result['is_valid_plate'],
-                        "detection_count": result['detection_count'],
-                        "details": {
-                            "texts": result['details'].get('texts', []),
-                            "scores": [float(s) for s in result['details'].get('scores', [])],
-                            "detection_score": float(result['details'].get('detection_score', 0.0)),
-                            "corrected": result['details'].get('corrected', False),
-                            "original_text": result['details'].get('original_text', ''),
-                            "is_valid_plate": result['details'].get('is_valid_plate', False),
-                            "fallback_used": result['details'].get('fallback_used', False)
-                        }
-                    }
-                    results.append(result_data)
-                    
-                except Exception as e:
-                    logger.error(f"处理文件 {file.filename} 失败: {str(e)}")
-                    results.append({
-                        "filename": file.filename,
-                        "success": False,
-                        "error": str(e)
-                    })
-            
-            return {
-                "total": len(results),
-                "results": results
-            }
-            
-        finally:
-            # 清理临时文件
-            for temp_path in temp_paths:
-                if temp_path and os.path.exists(temp_path):
-                    try:
-                        os.remove(temp_path)
-                    except:
-                        pass
-                        
-    except Exception as e:
-        logger.error(f"批量识别失败: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"批量识别失败: {str(e)}")
 

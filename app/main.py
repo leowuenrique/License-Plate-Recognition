@@ -69,7 +69,6 @@ async def root():
         "endpoints": {
             "health": "/health",
             "recognize": "/api/v1/recognize",
-            "recognize_batch": "/api/v1/recognize_batch",
             "docs": "/docs"
         }
     }

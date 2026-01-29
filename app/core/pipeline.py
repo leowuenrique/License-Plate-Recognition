@@ -716,38 +716,6 @@ class LicensePlatePipelineKP:
             }
         }
     
-    def recognize_batch(self,
-                       image_paths: List[str],
-                       angles: Optional[List[float]] = None,
-                       use_best_detection: Optional[bool] = None,
-                       target_width: Optional[int] = None,
-                       target_height: Optional[int] = None) -> List[Dict]:
-        """
-        批量识别多张图片
-        
-        Args:
-            image_paths: 图像路径列表
-            angles: 检测角度列表，如果为None则使用类初始化时设置的默认角度
-            use_best_detection: 是否只使用置信度最高的检测结果，如果为None则使用类初始化时的默认值
-            target_width: 透视变换目标宽度，如果为None则使用类初始化时的默认值
-            target_height: 透视变换目标高度，如果为None则使用类初始化时的默认值
-        
-        Returns:
-            识别结果列表
-        """
-        results = []
-        for image_path in image_paths:
-            result = self.recognize(
-                image_path,
-                angles=angles,
-                use_best_detection=use_best_detection,
-                target_width=target_width,
-                target_height=target_height
-            )
-            result['image_path'] = image_path
-            results.append(result)
-        
-        return results
 
 
 if __name__ == '__main__':

@@ -40,7 +40,7 @@
 │   │       ├── __init__.py           # API 路由注册
 │   │       └── endpoints/            # API 端点
 │   │           ├── __init__.py
-│   │           └── recognition.py    # 车牌识别端点（单张/批量）
+│   │           └── recognition.py    # 车牌识别端点
 │   │
 │   ├── core/                         # 核心业务逻辑模块
 │   │   ├── __init__.py
@@ -167,8 +167,7 @@ uvicorn app.main:app --reload
 |------|------|------|
 | GET | `/` | API 信息 |
 | GET | `/health` | 健康检查 |
-| POST | `/api/v1/recognize` | 单张图片识别 |
-| POST | `/api/v1/recognize_batch` | 批量识别 |
+| POST | `/api/v1/recognize` | 车牌识别 |
 
 ### 识别单张图片
 
@@ -220,21 +219,6 @@ with open("image.jpg", "rb") as f:
     "fallback_used": false
   }
 }
-```
-
-### 批量识别
-
-```python
-import requests
-
-url = "http://localhost:8000/api/v1/recognize_batch"
-files = [
-    ("files", open("image1.jpg", "rb")),
-    ("files", open("image2.jpg", "rb"))
-]
-response = requests.post(url, files=files)
-result = response.json()
-print(result)
 ```
 
 完整的 API 文档请访问 http://localhost:8000/docs 查看交互式文档。
